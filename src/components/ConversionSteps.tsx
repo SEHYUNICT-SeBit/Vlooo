@@ -10,7 +10,7 @@ import Link from 'next/link';
 import { CONVERSION_STEPS } from '@/data/menuItems';
 
 interface ConversionStepsProps {
-  currentStep?: number;
+  currentStep?: number | string;
 }
 
 export const ConversionSteps: React.FC<ConversionStepsProps> = ({ currentStep = 1 }) => {
