@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import '@/globals.css';
+import { AuthProvider } from '@/components/SessionProvider';
 
 export const metadata: Metadata = {
   title: 'Vlooo - PPT를 전문가 영상으로',
@@ -13,7 +14,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
-      <body>{children}</body>
+      <body>
+        <AuthProvider>{children}</AuthProvider>
+      </body>
     </html>
   );
 }

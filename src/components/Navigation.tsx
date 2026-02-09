@@ -7,6 +7,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { HEADER_MENU, ACCOUNT_MENU } from '@/data/menuItems';
 import { MenuItem } from '@/types/menu';
@@ -15,7 +16,9 @@ interface NavigationProps {
   isLoggedIn?: boolean;
 }
 
-export const Navigation: React.FC<NavigationProps> = ({ isLoggedIn = false }) => {
+export const Navigation: React.FC<NavigationProps> = ({ isLoggedIn }) => {
+  const { data: session } = useSession();
+  const resolvedLoggedIn = typeof isLoggedIn === 'boolean' ? isLoggedIn : !!session?.user;
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [accountDropdownOpen, setAccountDropdownOpen] = useState(false);
 
@@ -31,7 +34,7 @@ export const Navigation: React.FC<NavigationProps> = ({ isLoggedIn = false }) =>
     const hasChildren = item.children && item.children.length > 0;
     const isDropdownOpen = activeDropdown === item.id;
 
-    if (item.id === 'account' && isLoggedIn) {
+    if (item.id === 'account' && resolvedLoggedIn) {
       return (
         <div
           key={index}
@@ -68,7 +71,7 @@ export const Navigation: React.FC<NavigationProps> = ({ isLoggedIn = false }) =>
       );
     }
 
-    if (item.id === 'account' && !isLoggedIn) {
+    if (item.id === 'account' && !resolvedLoggedIn) {
       return (
         <Link
           key={index}
