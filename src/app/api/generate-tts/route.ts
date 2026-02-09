@@ -8,6 +8,7 @@ import { NextRequest } from 'next/server';
 import { z } from 'zod';
 import { successResponse, errorResponse, logError, createApiError, ERROR_CODES, validationError } from '@/utils/errors';
 import { TtsResponse } from '@/types/api';
+import axios from 'axios';
 
 const TtsRequestSchema = z.object({
   projectId: z.string().min(1),
@@ -80,25 +81,27 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // TODO: 실제 구현
-    // 1. ElevenLabs API 호출
-    // 2. 각 스크립트를 음성으로 변환
-    // 3. 생성된 음성을 R2에 저장
-    // 4. 음성 URL 및 길이 반환
+    // FastAPI 백엔드로 요청 전달
+    const backendUrl = process.env.FASTAPI_URL || 'http://localhost:8000';
 
-    const mockResponse: TtsResponse = {
+    const response = await axios.post(`${backendUrl}/api/generate-tts`, {
       projectId,
-      audioUrls: scripts.map((script) => ({
-        slideId: script.slideId,
-        slideNumber: script.slideNumber,
-        audioUrl: `https://audio.example.com/${projectId}/${script.slideId}.mp3`,
-        duration: script.duration || 5,
-      })),
-      totalDuration: scripts.reduce((acc, script) => acc + (script.duration || 5), 0),
-      generatedAt: new Date().toISOString(),
-    };
+      scripts,
+      voiceId,
+      voiceName,
+      speed,
+    });
 
-    return successResponse(mockResponse, 200);
+    if (!response.data.success) {
+      throw createApiError(
+        ERROR_CODES.TTS_GENERATION_FAILED,
+        response.data.error?.message || 'TTS 생성 실패',
+        500
+      );
+    }
+
+    const ttsResponse: TtsResponse = response.data.data;
+    return successResponse(ttsResponse, 200);
   } catch (error) {
     logError(error, { endpoint: '/api/generate-tts' });
     return errorResponse(error);
@@ -111,12 +114,20 @@ export async function POST(request: NextRequest) {
  */
 export async function GET() {
   try {
+    const backendUrl = process.env.FASTAPI_URL || 'http://localhost:8000';
+    const response = await axios.get(`${backendUrl}/api/tts/voices`);
+
+    if (!response.data.success) {
+      throw new Error(response.data.error?.message || '음성 목록 조회 실패');
+    }
+
+    return successResponse(response.data.data);
+  } catch (error) {
+    logError(error, { endpoint: '/api/generate-tts/voices' });
+    // 백엔드 장애 시 로컬 목록으로 폴백
     return successResponse({
       voices: AVAILABLE_VOICES,
       total: AVAILABLE_VOICES.length,
     });
-  } catch (error) {
-    logError(error, { endpoint: '/api/generate-tts/voices' });
-    return errorResponse(error);
   }
 }
