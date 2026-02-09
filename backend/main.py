@@ -34,8 +34,10 @@ app.add_middleware(
 
 # --------------- 라우터 등록 ---------------
 from app.routes.ppt import router as ppt_router
+from app.routes.script import router as script_router
 
 app.include_router(ppt_router)
+app.include_router(script_router)
 
 
 # --------------- 기본 엔드포인트 ---------------
@@ -67,6 +69,7 @@ async def api_status():
         "environment": os.getenv("FASTAPI_ENV", "production"),
         "services": {
             "ppt_parser": "ready",
+            "script_generator": "ready",
             "r2_storage": os.getenv("CLOUDFLARE_R2_ENDPOINT") is not None,
         },
     }

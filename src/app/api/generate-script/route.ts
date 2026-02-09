@@ -8,16 +8,17 @@ import { NextRequest } from 'next/server';
 import { z } from 'zod';
 import { successResponse, errorResponse, logError, createApiError, ERROR_CODES, validationError } from '@/utils/errors';
 import { ScriptGenerationResponse } from '@/types/api';
+/**
+ * POST /api/generate-script
+ * AI 스크립트 생성 엔드포인트
+ * FastAPI 백엔드로 요청 전달
+ */
 
-const ScriptGenerationRequestSchema = z.object({
-  projectId: z.string().min(1),
-  slides: z.array(
-    z.object({
-      slideId: z.string(),
-      slideNumber: z.number(),
-      title: z.string().optional(),
-      content: z.string(),
-      imageUrls: z.array(z.string()).default([]),
+import { NextRequest } from 'next/server';
+import { z } from 'zod';
+import { successResponse, errorResponse, logError, createApiError, ERROR_CODES, validationError } from '@/utils/errors';
+import { ScriptGenerationResponse } from '@/types/api';
+import axios from 'axios';
     })
   ),
   toneOfVoice: z.enum(['professional', 'friendly', 'casual']).default('professional'),
@@ -39,26 +40,28 @@ export async function POST(request: NextRequest) {
 
     console.log(`[SCRIPT_GEN] 스크립트 생성 시작: ${projectId} (${slides.length}개 슬라이드)`);
 
-    // TODO: 실제 구현
-    // 1. OpenAI API 호출 (GPT-4o-mini)
-    // 2. IT 전문가 페르소나 프롬프트 적용
-    // 3. 각 슬라이드별 나레이션 스크립트 생성
-    // 4. 한국어 자연스러움 검증
-
-    const mockResponse: ScriptGenerationResponse = {
+    // FastAPI 백엔드로 요청 전달
+    const backendUrl = process.env.FASTAPI_URL || 'http://localhost:8000';
+    
+    const response = await axios.post(`${backendUrl}/api/generate-script`, {
       projectId,
-      scripts: slides.map((slide) => ({
-        slideId: slide.slideId,
-        slideNumber: slide.slideNumber,
-        scriptText: `${slide.title || `슬라이드 ${slide.slideNumber}`}에 대한 나레이션 텍스트입니다.`,
-        duration: 5,
-        keywords: [],
-      })),
-      totalDuration: slides.length * 5,
-      generatedAt: new Date().toISOString(),
-    };
+      slides,
+      toneOfVoice,
+      language,
+      customInstructions,
+    });
+    
+    if (!response.data.success) {
+      throw createApiError(
+        ERROR_CODES.SCRIPT_GENERATION_FAILED,
+        response.data.error?.message || '스크립트 생성 실패',
+        500
+      );
+    }
+    
+    const scriptResponse: ScriptGenerationResponse = response.data.data;
 
-    return successResponse(mockResponse, 200);
+    return successResponse(scriptResponse, 200);
   } catch (error) {
     logError(error, { endpoint: '/api/generate-script' });
     return errorResponse(error);
