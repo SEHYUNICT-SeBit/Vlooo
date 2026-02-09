@@ -8,6 +8,7 @@ import { NextRequest } from 'next/server';
 import { z } from 'zod';
 import { successResponse, errorResponse, logError, createApiError, ERROR_CODES, validationError } from '@/utils/errors';
 import { VideoRenderResponse } from '@/types/api';
+import axios from 'axios';
 
 const VideoRenderRequestSchema = z.object({
   projectId: z.string().min(1),
@@ -57,25 +58,28 @@ export async function POST(request: NextRequest) {
 
     console.log(`[VIDEO_RENDER] 비디오 렌더링 시작: ${projectId} (${resolution}, ${fps}fps)`);
 
-    // TODO: 실제 구현
-    // 1. Cloudflare Workers 또는 FastAPI로 렌더링 작업 전송
-    // 2. FFmpeg 또는 Remotion 사용하여 비디오 합성
-    // 3. 렌더링 진행률 WebSocket으로 전송
-    // 4. 완료 후 R2에 저장
+    // FastAPI 백엔드로 요청 전달
+    const backendUrl = process.env.FASTAPI_URL || 'http://localhost:8000';
 
-    const totalDuration = audioUrls.reduce((acc, audio) => acc + audio.duration, 0);
-
-    const mockResponse: VideoRenderResponse = {
+    const response = await axios.post(`${backendUrl}/api/render-video`, {
       projectId,
-      videoUrl: `https://video.example.com/${projectId}/final.${outputFormat}`,
-      videoSize: 1024 * 1024 * 100, // 100MB (mock)
-      duration: totalDuration,
+      slides,
+      audioUrls,
       resolution,
-      renderStatus: 'processing',
-      completedAt: undefined,
-    };
+      fps,
+      outputFormat,
+    });
 
-    return successResponse(mockResponse, 202); // 202 Accepted (처리 중)
+    if (!response.data.success) {
+      throw createApiError(
+        ERROR_CODES.VIDEO_RENDER_FAILED,
+        response.data.error?.message || '비디오 렌더링 실패',
+        500
+      );
+    }
+
+    const renderResponse: VideoRenderResponse = response.data.data;
+    return successResponse(renderResponse, 200);
   } catch (error) {
     logError(error, { endpoint: '/api/render-video' });
     return errorResponse(error);

@@ -5,11 +5,18 @@ Vlooo FastAPI 백엔드 메인 애플리케이션
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 import os
 from dotenv import load_dotenv
+from pathlib import Path
 
 # 환경 변수 로드
 load_dotenv()
+
+# 기본 디렉터리 설정
+BASE_DIR = Path(__file__).resolve().parent
+MEDIA_DIR = Path(os.getenv("MEDIA_DIR", str(BASE_DIR / "media")))
+MEDIA_DIR.mkdir(parents=True, exist_ok=True)
 
 # FastAPI 애플리케이션 생성
 app = FastAPI(
@@ -31,15 +38,20 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# 정적 파일 서빙 (렌더된 비디오)
+app.mount("/media", StaticFiles(directory=str(MEDIA_DIR)), name="media")
+
 
 # --------------- 라우터 등록 ---------------
 from app.routes.ppt import router as ppt_router
 from app.routes.script import router as script_router
 from app.routes.tts import router as tts_router
+from app.routes.render import router as render_router
 
 app.include_router(ppt_router)
 app.include_router(script_router)
 app.include_router(tts_router)
+app.include_router(render_router)
 
 
 # --------------- 기본 엔드포인트 ---------------
@@ -73,6 +85,7 @@ async def api_status():
             "ppt_parser": "ready",
             "script_generator": "ready",
             "tts_generator": "ready",
+            "video_renderer": "ready",
             "r2_storage": os.getenv("CLOUDFLARE_R2_ENDPOINT") is not None,
         },
     }
