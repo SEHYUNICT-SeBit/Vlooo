@@ -40,3 +40,5 @@ git push -u origin main
 
 ---
 ì¶”ê°€ë¡œ ì›í•˜ì‹œë©´ ìžë™í™”ëœ GitHub Actions ì›Œí¬í”Œë¡œ(ë¹„ë°€ê°’ ì„¤ì • í¬í•¨) í…œí”Œë¦¿ë„ ë§Œë“¤ì–´ ë“œë¦¬ê² ìŠµë‹ˆë‹¤.
+
+> **ºñ»ó ´ëÃ¥**: wrangler.tomlÀÌ °è¼Ó ¹«½ÃµÇ¸é Cloudflare ´ë½Ãº¸µå > Settings > Functions > Compatibility Flags¿¡ 'nodejs_compat'À» Á÷Á¢ Ãß°¡ÇÏ¼¼¿ä.
