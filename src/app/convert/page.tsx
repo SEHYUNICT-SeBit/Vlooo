@@ -76,7 +76,7 @@ export default function ConvertPage() {
     };
 
     startParsing();
-  }, [fileId, currentStep]);
+  }, [fileId, currentStep, setCurrentStep, setError, setLoading, setProjectId, setSlides]);
 
   // 슬라이드 준비 후 스크립트 생성 시작
   useEffect(() => {
@@ -102,7 +102,7 @@ export default function ConvertPage() {
     };
 
     generateScripts();
-  }, [projectId, slides, currentStep]);
+  }, [projectId, slides, currentStep, loading, setCurrentStep, setError, setLoading, setScripts]);
 
   // 스크립트 준비 후 TTS 생성
   useEffect(() => {
@@ -128,7 +128,7 @@ export default function ConvertPage() {
     };
 
     generateTts();
-  }, [projectId, scripts, currentStep]);
+  }, [projectId, scripts, currentStep, loading, setAudioUrls, setCurrentStep, setError, setLoading]);
 
   // 음성 준비 후 비디오 렌더링
   useEffect(() => {
@@ -156,7 +156,7 @@ export default function ConvertPage() {
     };
 
     renderVideo();
-  }, [projectId, slides, audioUrls, currentStep]);
+  }, [projectId, slides, audioUrls, currentStep, loading, setCurrentStep, setError, setLoading, setVideoUrl]);
 
   const handleUploadComplete = (newFileId: string) => {
     setFileId(newFileId);
