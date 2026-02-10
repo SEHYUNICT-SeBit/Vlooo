@@ -13,11 +13,6 @@ const nextConfig = {
     loader: process.env.NODE_ENV === 'production' ? 'custom' : 'default',
     loaderFile: './src/utils/imageLoader.ts',
   },
-  
-  // Edge Runtime 지원
-  experimental: {
-    runtime: 'experimental-edge',
-  },
 };
 
 module.exports = nextConfig;
