@@ -14,7 +14,6 @@ import {
   ApiResponse,
   UploadProgress,
 } from '@/types/api';
-import { ApiError } from '@/utils/errors';
 
 class ApiClient {
   private axiosInstance: AxiosInstance;

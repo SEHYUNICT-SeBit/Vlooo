@@ -1,5 +1,13 @@
-﻿compatibility_flags = ["nodejs_compat"]
+﻿name = "vlooo"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
 pages_build_output_dir = ".vercel/output/static"
+
+[build]
+command = "npm run pages:build"
+
+[build.environment]
+NODE_VERSION = "18"
 
 [vars]
 NEXT_PUBLIC_APP_ENV = "production"
