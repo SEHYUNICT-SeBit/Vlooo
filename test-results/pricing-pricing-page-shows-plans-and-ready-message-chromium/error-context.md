@@ -1,0 +1,211 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - generic [ref=e4]:
+      - link "🎬 Vlooo" [ref=e5] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e6]: 🎬
+        - generic [ref=e7]: Vlooo
+      - generic [ref=e8]:
+        - link "홈" [ref=e10] [cursor=pointer]:
+          - /url: /
+        - link "대시보드" [ref=e12] [cursor=pointer]:
+          - /url: /dashboard
+        - link "upload 변환하기" [ref=e14] [cursor=pointer]:
+          - /url: /convert
+          - generic [ref=e15]: upload
+          - text: 변환하기
+        - link "가격" [ref=e17] [cursor=pointer]:
+          - /url: /pricing
+        - link "help-circle 지원" [ref=e19] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e20]: help-circle
+          - text: 지원
+        - link "로그인" [ref=e21] [cursor=pointer]:
+          - /url: /login
+  - main [ref=e22]:
+    - generic [ref=e23]:
+      - generic [ref=e24]:
+        - heading "요금제" [level=1] [ref=e25]
+        - paragraph [ref=e26]: 단건 결제와 구독형 요금제를 모두 제공합니다. 결제는 곧 오픈됩니다.
+      - generic [ref=e28]:
+        - generic [ref=e29]: 🚧
+        - generic [ref=e30]:
+          - heading "결제 준비중" [level=2] [ref=e31]
+          - paragraph [ref=e32]: 현재 다양한 결제 플랫폼 연동을 준비하고 있습니다. 업데이트 소식을 알려드릴게요.
+      - generic [ref=e33]:
+        - generic [ref=e34]:
+          - heading "단건 결제" [level=2] [ref=e35]
+          - generic [ref=e36]: 필요할 때만 결제
+        - generic [ref=e37]:
+          - generic [ref=e38]:
+            - heading "단건 1회" [level=3] [ref=e40]
+            - paragraph [ref=e41]: 1개의 PPT를 영상으로 변환
+            - generic [ref=e43]: 9,900원
+            - list [ref=e44]:
+              - listitem [ref=e45]:
+                - generic [ref=e46]: •
+                - generic [ref=e47]: 720p 기본 출력
+              - listitem [ref=e48]:
+                - generic [ref=e49]: •
+                - generic [ref=e50]: 기본 음성 1종
+              - listitem [ref=e51]:
+                - generic [ref=e52]: •
+                - generic [ref=e53]: 표준 렌더링
+            - button "결제 준비중" [disabled] [ref=e54]
+          - generic [ref=e55]:
+            - generic [ref=e56]:
+              - heading "단건 5회" [level=3] [ref=e57]
+              - generic [ref=e58]: 추천
+            - paragraph [ref=e59]: 5개의 PPT를 영상으로 변환
+            - generic [ref=e61]: 39,000원
+            - list [ref=e62]:
+              - listitem [ref=e63]:
+                - generic [ref=e64]: •
+                - generic [ref=e65]: 1080p 출력
+              - listitem [ref=e66]:
+                - generic [ref=e67]: •
+                - generic [ref=e68]: 음성 2종 선택
+              - listitem [ref=e69]:
+                - generic [ref=e70]: •
+                - generic [ref=e71]: 우선 렌더링
+            - button "결제 준비중" [disabled] [ref=e72]
+          - generic [ref=e73]:
+            - heading "단건 10회" [level=3] [ref=e75]
+            - paragraph [ref=e76]: 10개의 PPT를 영상으로 변환
+            - generic [ref=e78]: 69,000원
+            - list [ref=e79]:
+              - listitem [ref=e80]:
+                - generic [ref=e81]: •
+                - generic [ref=e82]: 1080p 출력
+              - listitem [ref=e83]:
+                - generic [ref=e84]: •
+                - generic [ref=e85]: 음성 3종 선택
+              - listitem [ref=e86]:
+                - generic [ref=e87]: •
+                - generic [ref=e88]: 우선 렌더링
+            - button "결제 준비중" [disabled] [ref=e89]
+      - generic [ref=e90]:
+        - generic [ref=e91]:
+          - heading "구독형 요금제" [level=2] [ref=e92]
+          - generic [ref=e93]: 정기적으로 대량 변환
+        - generic [ref=e94]:
+          - generic [ref=e95]:
+            - heading "월 10건" [level=3] [ref=e97]
+            - paragraph [ref=e98]: 월 10건까지 변환
+            - generic [ref=e100]: 49,000원 / 월
+            - list [ref=e101]:
+              - listitem [ref=e102]:
+                - generic [ref=e103]: •
+                - generic [ref=e104]: 1080p 출력
+              - listitem [ref=e105]:
+                - generic [ref=e106]: •
+                - generic [ref=e107]: 음성 3종 선택
+              - listitem [ref=e108]:
+                - generic [ref=e109]: •
+                - generic [ref=e110]: 우선 렌더링
+              - listitem [ref=e111]:
+                - generic [ref=e112]: •
+                - generic [ref=e113]: 월간 리포트
+            - button "결제 준비중" [disabled] [ref=e114]
+          - generic [ref=e115]:
+            - generic [ref=e116]:
+              - heading "월 30건" [level=3] [ref=e117]
+              - generic [ref=e118]: 추천
+            - paragraph [ref=e119]: 월 30건까지 변환
+            - generic [ref=e121]: 129,000원 / 월
+            - list [ref=e122]:
+              - listitem [ref=e123]:
+                - generic [ref=e124]: •
+                - generic [ref=e125]: 1080p 출력
+              - listitem [ref=e126]:
+                - generic [ref=e127]: •
+                - generic [ref=e128]: 음성 5종 선택
+              - listitem [ref=e129]:
+                - generic [ref=e130]: •
+                - generic [ref=e131]: 빠른 렌더링
+              - listitem [ref=e132]:
+                - generic [ref=e133]: •
+                - generic [ref=e134]: 월간 리포트
+            - button "결제 준비중" [disabled] [ref=e135]
+          - generic [ref=e136]:
+            - heading "무제한" [level=3] [ref=e138]
+            - paragraph [ref=e139]: 제한 없이 변환
+            - generic [ref=e141]: 249,000원 / 월
+            - list [ref=e142]:
+              - listitem [ref=e143]:
+                - generic [ref=e144]: •
+                - generic [ref=e145]: 4K 출력
+              - listitem [ref=e146]:
+                - generic [ref=e147]: •
+                - generic [ref=e148]: 프리미엄 음성
+              - listitem [ref=e149]:
+                - generic [ref=e150]: •
+                - generic [ref=e151]: 최우선 렌더링
+              - listitem [ref=e152]:
+                - generic [ref=e153]: •
+                - generic [ref=e154]: 전담 지원
+            - button "결제 준비중" [disabled] [ref=e155]
+      - generic [ref=e156]:
+        - heading "결제 플랫폼 확장" [level=3] [ref=e157]
+        - paragraph [ref=e158]: Stripe, 토스페이먼츠, 포트원 등 다양한 결제 플랫폼과 연동할 수 있도록 설계했습니다.
+        - generic [ref=e159]:
+          - generic [ref=e160]:
+            - paragraph [ref=e161]: 단건 결제
+            - paragraph [ref=e162]: 카드/간편결제/계좌이체
+          - generic [ref=e163]:
+            - paragraph [ref=e164]: 구독 결제
+            - paragraph [ref=e165]: 월 자동 결제 및 사용량 추적
+          - generic [ref=e166]:
+            - paragraph [ref=e167]: 영수증/세금계산서
+            - paragraph [ref=e168]: 기업 고객용 증빙 지원
+  - contentinfo [ref=e169]:
+    - generic [ref=e170]:
+      - generic [ref=e171]:
+        - generic [ref=e172]:
+          - link "🎬 Vlooo" [ref=e173] [cursor=pointer]:
+            - /url: /
+            - generic [ref=e174]: 🎬
+            - generic [ref=e175]: Vlooo
+          - paragraph [ref=e176]: 내 PPT가 전문가의 영상으로 흐르다
+          - paragraph [ref=e177]: © 2026 Vlooo. 모든 권리 보유.
+        - generic [ref=e178]:
+          - heading "회사" [level=4] [ref=e179]
+          - list [ref=e180]:
+            - listitem [ref=e181]:
+              - link "회사 소개" [ref=e182] [cursor=pointer]:
+                - /url: /about
+            - listitem [ref=e183]:
+              - link "블로그" [ref=e184] [cursor=pointer]:
+                - /url: /blog
+            - listitem [ref=e185]:
+              - link "문의" [ref=e186] [cursor=pointer]:
+                - /url: /contact
+        - generic [ref=e187]:
+          - heading "정책" [level=4] [ref=e188]
+          - list [ref=e189]:
+            - listitem [ref=e190]:
+              - link "개인정보 처리방침" [ref=e191] [cursor=pointer]:
+                - /url: /privacy
+            - listitem [ref=e192]:
+              - link "이용약관" [ref=e193] [cursor=pointer]:
+                - /url: /terms
+      - generic [ref=e194]:
+        - generic [ref=e195]:
+          - generic [ref=e196]: "팔로우하기:"
+          - link "twitter" [ref=e197] [cursor=pointer]:
+            - /url: https://twitter.com/vlooo
+          - link "youtube" [ref=e198] [cursor=pointer]:
+            - /url: https://youtube.com/@vlooo
+          - link "instagram" [ref=e199] [cursor=pointer]:
+            - /url: https://instagram.com/vlooo
+        - generic [ref=e200]:
+          - paragraph [ref=e201]: 이용약관에 동의하고 Vlooo를 이용하고 있습니다.
+          - paragraph [ref=e202]:
+            - text: 문의사항이 있으신가요?
+            - link "고객지원팀에 연락주세요" [ref=e203] [cursor=pointer]:
+              - /url: /support/contact
+  - alert [ref=e204]
+```

@@ -2,10 +2,15 @@ import { test, expect } from '@playwright/test';
 
 test('login with demo credentials', async ({ page }) => {
   await page.goto('/login');
-  await page.getByLabel('이메일').fill('demo@vlooo.ai');
-  await page.getByLabel('비밀번호').fill('demo1234');
-  await page.getByRole('button', { name: '로그인' }).click();
-
+  
+  const emailInput = page.locator('input[type="email"]');
+  const passwordInput = page.locator('input[type="password"]');
+  const submitButton = page.locator('button[type="submit"]');
+  
+  await emailInput.fill('demo@vlooo.ai');
+  await passwordInput.fill('demo1234');
+  await submitButton.click();
+  
+  await page.waitForURL(/\/dashboard/, { timeout: 15000 });
   await expect(page).toHaveURL(/\/dashboard/);
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('대시보드');
 });

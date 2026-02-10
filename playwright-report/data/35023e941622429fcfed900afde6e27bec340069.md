@@ -1,0 +1,91 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - generic [ref=e4]:
+      - link "🎬 Vlooo" [ref=e5] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e6]: 🎬
+        - generic [ref=e7]: Vlooo
+      - generic [ref=e8]:
+        - link "홈" [ref=e10] [cursor=pointer]:
+          - /url: /
+        - link "대시보드" [ref=e12] [cursor=pointer]:
+          - /url: /dashboard
+        - link "upload 변환하기" [ref=e14] [cursor=pointer]:
+          - /url: /convert
+          - generic [ref=e15]: upload
+          - text: 변환하기
+        - link "가격" [ref=e17] [cursor=pointer]:
+          - /url: /pricing
+        - link "help-circle 지원" [ref=e19] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e20]: help-circle
+          - text: 지원
+        - link "로그인" [ref=e21] [cursor=pointer]:
+          - /url: /login
+  - main [ref=e22]:
+    - generic [ref=e23]:
+      - heading "로그인" [level=1] [ref=e24]
+      - paragraph [ref=e25]: Vlooo 계정으로 로그인하세요
+      - generic [ref=e26]:
+        - generic [ref=e27]:
+          - generic [ref=e28]: 이메일
+          - textbox "demo@vlooo.ai" [ref=e29]
+        - generic [ref=e30]:
+          - generic [ref=e31]: 비밀번호
+          - textbox "demo1234" [ref=e32]
+        - button "로그인" [ref=e33] [cursor=pointer]
+      - generic [ref=e34]:
+        - paragraph [ref=e35]: 데모 계정
+        - paragraph [ref=e36]: "이메일: demo@vlooo.ai"
+        - paragraph [ref=e37]: "비밀번호: demo1234"
+  - contentinfo [ref=e38]:
+    - generic [ref=e39]:
+      - generic [ref=e40]:
+        - generic [ref=e41]:
+          - link "🎬 Vlooo" [ref=e42] [cursor=pointer]:
+            - /url: /
+            - generic [ref=e43]: 🎬
+            - generic [ref=e44]: Vlooo
+          - paragraph [ref=e45]: 내 PPT가 전문가의 영상으로 흐르다
+          - paragraph [ref=e46]: © 2026 Vlooo. 모든 권리 보유.
+        - generic [ref=e47]:
+          - heading "회사" [level=4] [ref=e48]
+          - list [ref=e49]:
+            - listitem [ref=e50]:
+              - link "회사 소개" [ref=e51] [cursor=pointer]:
+                - /url: /about
+            - listitem [ref=e52]:
+              - link "블로그" [ref=e53] [cursor=pointer]:
+                - /url: /blog
+            - listitem [ref=e54]:
+              - link "문의" [ref=e55] [cursor=pointer]:
+                - /url: /contact
+        - generic [ref=e56]:
+          - heading "정책" [level=4] [ref=e57]
+          - list [ref=e58]:
+            - listitem [ref=e59]:
+              - link "개인정보 처리방침" [ref=e60] [cursor=pointer]:
+                - /url: /privacy
+            - listitem [ref=e61]:
+              - link "이용약관" [ref=e62] [cursor=pointer]:
+                - /url: /terms
+      - generic [ref=e63]:
+        - generic [ref=e64]:
+          - generic [ref=e65]: "팔로우하기:"
+          - link "twitter" [ref=e66] [cursor=pointer]:
+            - /url: https://twitter.com/vlooo
+          - link "youtube" [ref=e67] [cursor=pointer]:
+            - /url: https://youtube.com/@vlooo
+          - link "instagram" [ref=e68] [cursor=pointer]:
+            - /url: https://instagram.com/vlooo
+        - generic [ref=e69]:
+          - paragraph [ref=e70]: 이용약관에 동의하고 Vlooo를 이용하고 있습니다.
+          - paragraph [ref=e71]:
+            - text: 문의사항이 있으신가요?
+            - link "고객지원팀에 연락주세요" [ref=e72] [cursor=pointer]:
+              - /url: /support/contact
+  - alert [ref=e73]
+```
