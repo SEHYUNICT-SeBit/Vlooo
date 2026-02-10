@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
     console.log(`[VIDEO_RENDER] 비디오 렌더링 시작: ${projectId} (${resolution}, ${fps}fps)`);
 
     // FastAPI 백엔드로 요청 전달
-    const backendUrl = process.env.FASTAPI_URL || 'http://localhost:8000';
+    const backendUrl = process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:8000';
 
     const response = await axios.post(`${backendUrl}/api/render-video`, {
       projectId,

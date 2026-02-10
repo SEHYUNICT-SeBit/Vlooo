@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
     }
 
     // FastAPI 백엔드로 요청 전달
-    const backendUrl = process.env.FASTAPI_URL || 'http://localhost:8000';
+    const backendUrl = process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:8000';
 
     const response = await axios.post(`${backendUrl}/api/generate-tts`, {
       projectId,
@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
  */
 export async function GET() {
   try {
-    const backendUrl = process.env.FASTAPI_URL || 'http://localhost:8000';
+    const backendUrl = process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:8000';
     const response = await axios.get(`${backendUrl}/api/tts/voices`);
 
     if (!response.data.success) {

@@ -19,7 +19,7 @@ import { ApiError } from '@/utils/errors';
 class ApiClient {
   private axiosInstance: AxiosInstance;
 
-  constructor(baseURL: string = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000') {
+  constructor(baseURL: string = process.env.NEXT_PUBLIC_API_URL || '') {
     this.axiosInstance = axios.create({
       baseURL,
       timeout: 30000,
