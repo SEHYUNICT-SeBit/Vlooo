@@ -125,7 +125,7 @@ export function successResponse<T>(data: T, statusCode: number = 200): NextRespo
 /**
  * API 에러 응답 생성
  */
-export function errorResponse(error: ApiError | Error | string): NextResponse<ApiResponse> {
+export function errorResponse(error: unknown): NextResponse<ApiResponse> {
   if (error instanceof ApiError) {
     return NextResponse.json(
       {

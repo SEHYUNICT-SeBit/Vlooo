@@ -13,6 +13,7 @@ import {
   ProjectStatus,
   ApiResponse,
   UploadProgress,
+  ApiError,
 } from '@/types/api';
 
 class ApiClient {

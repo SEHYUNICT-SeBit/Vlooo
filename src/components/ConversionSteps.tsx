@@ -19,6 +19,8 @@ export const ConversionSteps: React.FC<ConversionStepsProps> = ({ currentStep = 
     return match ? parseInt(match[0]) : 0;
   };
 
+  const currentStepNum = Number(currentStep);
+
   return (
     <div className="bg-white rounded-lg p-6 mb-8">
       <h2 className="text-lg font-bold text-gray-900 mb-6">변환 프로세스</h2>
@@ -27,8 +29,8 @@ export const ConversionSteps: React.FC<ConversionStepsProps> = ({ currentStep = 
       <div className="flex flex-col lg:flex-row gap-4">
         {CONVERSION_STEPS.map((step, index) => {
           const stepNumber = getStepNumber(step.id);
-          const isCompleted = stepNumber < currentStep;
-          const isCurrent = stepNumber === currentStep;
+          const isCompleted = stepNumber < currentStepNum;
+          const isCurrent = stepNumber === currentStepNum;
 
           return (
             <div key={index} className="flex-1">
@@ -91,12 +93,12 @@ export const ConversionSteps: React.FC<ConversionStepsProps> = ({ currentStep = 
       <div className="mt-6 bg-gray-100 rounded-full h-2 overflow-hidden">
         <div
           className="bg-blue-600 h-full transition-all duration-300"
-          style={{ width: `${(currentStep / CONVERSION_STEPS.length) * 100}%` }}
+          style={{ width: `${(currentStepNum / CONVERSION_STEPS.length) * 100}%` }}
         ></div>
       </div>
 
       <div className="text-center mt-2 text-sm text-gray-600">
-        {currentStep}단계 / {CONVERSION_STEPS.length}단계
+        {currentStepNum}단계 / {CONVERSION_STEPS.length}단계
       </div>
     </div>
   );

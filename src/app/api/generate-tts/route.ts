@@ -26,7 +26,7 @@ const TtsRequestSchema = z.object({
 });
 
 // 사전정의된 ElevenLabs 음성 옵션
-export const AVAILABLE_VOICES = [
+const AVAILABLE_VOICES = [
   {
     id: 'male_professional_kr',
     name: 'Professional Male (한국어)',
