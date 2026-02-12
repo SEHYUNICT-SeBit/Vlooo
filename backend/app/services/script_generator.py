@@ -6,6 +6,7 @@ IT 전문가 페르소나로 자연스러운 나레이션 생성
 import os
 from typing import List, Dict, Any, Optional
 from openai import OpenAI
+import requests
 
 # IT 전문가 페르소나 프롬프트
 IT_EXPERT_SYSTEM_PROMPT = """당신은 경험 많은 IT 기술과 비즈니스 전략 전문가입니다.
@@ -26,7 +27,11 @@ class OpenAIScriptGenerator:
     """OpenAI를 사용한 스크립트 생성"""
     
     def __init__(self, api_key: Optional[str] = None):
-        self.client = OpenAI(api_key=api_key or os.getenv("OPENAI_API_KEY"))
+        self.openai_api_key = api_key or os.getenv("OPENAI_API_KEY")
+        self.client = OpenAI(api_key=self.openai_api_key) if self.openai_api_key else None
+        self.local_provider = os.getenv("LOCAL_LLM_PROVIDER", "").lower()
+        self.ollama_url = os.getenv("OLLAMA_URL", "http://localhost:11434")
+        self.ollama_model = os.getenv("OLLAMA_MODEL", "llama3.1")
     
     def generate_script(
         self,
@@ -93,7 +98,16 @@ class OpenAIScriptGenerator:
 
 스크립트만 작성해주세요. 다른 설명은 하지 마세요."""
         
+        # 로컬 LLM 우선 사용 또는 OpenAI 키 미설정 시 Ollama 사용
+        if self.local_provider == "ollama" or not self.openai_api_key:
+            script = self._generate_with_ollama(prompt)
+            if script:
+                return script
+
         try:
+            if not self.client:
+                raise RuntimeError("OPENAI_API_KEY가 설정되지 않았습니다")
+
             response = self.client.chat.completions.create(
                 model="gpt-4o-mini",
                 messages=[
@@ -109,13 +123,36 @@ class OpenAIScriptGenerator:
                 temperature=0.7,
                 max_tokens=500,
             )
-            
+
             return response.choices[0].message.content.strip()
-        
+
         except Exception as e:
             print(f"OpenAI API 오류: {e}")
             # 폴백: 기본 스크립트 생성
             return f"{title}. {content}"
+
+    def _generate_with_ollama(self, prompt: str) -> Optional[str]:
+        """Ollama 로컬 모델로 스크립트 생성"""
+        try:
+            url = f"{self.ollama_url.rstrip('/')}/api/generate"
+            payload = {
+                "model": self.ollama_model,
+                "prompt": f"{IT_EXPERT_SYSTEM_PROMPT}\n\n{prompt}",
+                "stream": False,
+                "options": {
+                    "temperature": 0.7,
+                },
+            }
+
+            response = requests.post(url, json=payload, timeout=120)
+            response.raise_for_status()
+            data = response.json()
+            content = data.get("response", "").strip()
+            return content or None
+
+        except Exception as e:
+            print(f"Ollama 호출 오류: {e}")
+            return None
     
     def _estimate_duration(self, script: str) -> int:
         """

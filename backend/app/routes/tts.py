@@ -7,13 +7,19 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 from typing import List, Optional
 from datetime import datetime
+import asyncio
 import base64
 
-from app.services.tts_service import ElevenLabsTTSService
+from app.services.tts_service import GoogleTTSService
 from app.services.r2_storage import get_r2_service
 
 
 router = APIRouter(prefix="/api", tags=["tts"])
+
+
+def _log(level: str, step: str, message: str):
+    timestamp = datetime.utcnow().isoformat()
+    print(f"[{timestamp}] [TTS] [{level}] [{step}] {message}")
 
 
 class ScriptItem(BaseModel):
@@ -46,8 +52,8 @@ class GenerateTtsResponse(BaseModel):
 
 
 def _resolve_voice_id(voice_id: Optional[str], voice_name: Optional[str]) -> str:
-    """voiceId 또는 voiceName을 ElevenLabs voice_id로 변환"""
-    options = ElevenLabsTTSService.get_voice_options()
+    """voiceId 또는 voiceName을 Google TTS voice_id로 변환"""
+    options = GoogleTTSService.get_voice_options()
 
     if voice_id:
         # 사전 정의된 키이면 매핑
@@ -77,9 +83,30 @@ async def generate_tts(request: GenerateTtsRequest) -> JSONResponse:
             raise HTTPException(status_code=400, detail="projectId가 필요합니다")
         if not request.scripts or len(request.scripts) == 0:
             raise HTTPException(status_code=400, detail="최소 1개 이상의 스크립트가 필요합니다")
+        
+        # 이미 완료된 단계인지 체크 (재개 로직)
+        from main import get_stage_result
+        cached_result = get_stage_result(request.projectId, "voice-synthesis")
+        if cached_result and cached_result.get("status") == "completed":
+            _log("MINOR", "CACHE_HIT", f"projectId={request.projectId} - using cached audio")
+            cached_data = cached_result.get("data", {})
+            return JSONResponse(
+                status_code=200,
+                content={
+                    "success": True,
+                    "data": cached_data,
+                    "cached": True,
+                    "timestamp": datetime.utcnow().isoformat(),
+                }
+            )
 
         voice_id = _resolve_voice_id(request.voiceId, request.voiceName)
-        service = ElevenLabsTTSService()
+        _log(
+            "MINOR",
+            "START",
+            f"projectId={request.projectId} scripts={len(request.scripts)} voice={voice_id}",
+        )
+        service = GoogleTTSService()
 
         # R2 사용 가능 여부 확인
         r2_service = None
@@ -88,11 +115,23 @@ async def generate_tts(request: GenerateTtsRequest) -> JSONResponse:
         except Exception:
             r2_service = None
 
+        # 진행 상태 업데이트 import
+        from main import update_project_progress
+
         audio_items: List[AudioItem] = []
         total_duration = 0.0
 
-        for script in request.scripts:
-            audio_data = service.synthesize_speech(
+        for idx, script in enumerate(request.scripts, 1):
+            # 진행 상태 업데이트
+            update_project_progress(
+                request.projectId,
+                "voice-synthesis",
+                current=idx,
+                total=len(request.scripts),
+                details=f"슬라이드 {idx}/{len(request.scripts)} 음성 합성 중..."
+            )
+            audio_data = await asyncio.to_thread(
+                service.synthesize_speech,
                 text=script.scriptText,
                 voice_id=voice_id,
                 speed=request.speed or 1.0,
@@ -133,6 +172,17 @@ async def generate_tts(request: GenerateTtsRequest) -> JSONResponse:
             totalDuration=total_duration,
             generatedAt=datetime.utcnow().isoformat(),
         )
+        
+        # TTS 결과 저장 (재개 시 사용)
+        from main import save_stage_result
+        save_stage_result(
+            request.projectId,
+            "voice-synthesis",
+            "completed",
+            data=response.model_dump()
+        )
+
+        _log("MAJOR", "DONE", f"duration={total_duration}s audio={len(audio_items)}")
 
         return JSONResponse(
             status_code=200,
@@ -144,6 +194,7 @@ async def generate_tts(request: GenerateTtsRequest) -> JSONResponse:
         )
 
     except HTTPException as e:
+        _log("CRITICAL", "ERROR", str(e.detail))
         return JSONResponse(
             status_code=e.status_code,
             content={
@@ -157,6 +208,7 @@ async def generate_tts(request: GenerateTtsRequest) -> JSONResponse:
         )
 
     except Exception as e:
+        _log("CRITICAL", "ERROR", str(e))
         return JSONResponse(
             status_code=500,
             content={

@@ -1,0 +1,4 @@
+# Vlooo Monitor GUI 요구사항
+requests>=2.31.0
+pyinstaller>=6.0.0
+pywin32>=305  # Windows 지원

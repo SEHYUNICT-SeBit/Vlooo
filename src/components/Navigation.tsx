@@ -6,129 +6,56 @@
 
 'use client';
 
-import React, { useState } from 'react';
-import { useSession } from 'next-auth/react';
+import React from 'react';
 import Link from 'next/link';
-import { HEADER_MENU, ACCOUNT_MENU } from '@/data/menuItems';
-import { MenuItem } from '@/types/menu';
 
 interface NavigationProps {
   isLoggedIn?: boolean;
+  showSidebarToggle?: boolean;
+  onToggleSidebar?: () => void;
+  onLoginClick?: () => void;
 }
 
-export const Navigation: React.FC<NavigationProps> = ({ isLoggedIn }) => {
-  const { data: session } = useSession();
-  const resolvedLoggedIn = typeof isLoggedIn === 'boolean' ? isLoggedIn : !!session?.user;
-  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
-  const [accountDropdownOpen, setAccountDropdownOpen] = useState(false);
-
-  const handleMouseEnter = (itemId: string) => {
-    setActiveDropdown(itemId);
-  };
-
-  const handleMouseLeave = () => {
-    setActiveDropdown(null);
-  };
-
-  const renderMenuItem = (item: MenuItem, index: number) => {
-    const hasChildren = item.children && item.children.length > 0;
-    const isDropdownOpen = activeDropdown === item.id;
-
-    if (item.id === 'account' && resolvedLoggedIn) {
-      return (
-        <div
-          key={index}
-          className="relative"
-          onMouseEnter={() => setAccountDropdownOpen(true)}
-          onMouseLeave={() => setAccountDropdownOpen(false)}
-        >
-          <button className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-blue-600 transition-colors">
-            {item.icon && <span className="text-lg">{item.icon}</span>}
-            {item.label}
-          </button>
-
-          {accountDropdownOpen && (
-            <div className="absolute right-0 mt-0 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
-              {ACCOUNT_MENU.map((menuItem, idx) => (
-                <Link
-                  key={idx}
-                  href={menuItem.path || '#'}
-                  className="block px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors border-b border-gray-100 last:border-b-0"
-                >
-                  <div className="flex items-center justify-between">
-                    <span>{menuItem.label}</span>
-                    {menuItem.badge && (
-                      <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
-                        {menuItem.badge}
-                      </span>
-                    )}
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
-      );
-    }
-
-    if (item.id === 'account' && !resolvedLoggedIn) {
-      return (
-        <Link
-          key={index}
-          href="/login"
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          로그인
-        </Link>
-      );
-    }
-
-    return (
-      <div
-        key={index}
-        className="relative"
-        onMouseEnter={() => handleMouseEnter(item.id)}
-        onMouseLeave={handleMouseLeave}
-      >
-        <Link
-          href={item.path || '#'}
-          className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-blue-600 transition-colors"
-        >
-          {item.icon && <span className="text-lg">{item.icon}</span>}
-          {item.label}
-        </Link>
-
-        {hasChildren && isDropdownOpen && (
-          <div className="absolute top-full left-0 mt-0 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
-            {item.children!.map((child, idx) => (
-              <Link
-                key={idx}
-                href={child.path || '#'}
-                className="block px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors border-b border-gray-100 last:border-b-0"
-              >
-                {child.label}
-              </Link>
-            ))}
-          </div>
-        )}
-      </div>
-    );
-  };
+export const Navigation: React.FC<NavigationProps> = ({
+  isLoggedIn = false,
+  showSidebarToggle = false,
+  onToggleSidebar,
+  onLoginClick,
+}) => {
+  // 로그인 기능 비활성화
 
   return (
-    <nav className="bg-white shadow-md">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* 로고 */}
-          <Link href="/" className="flex items-center gap-2 font-bold text-2xl text-blue-600">
-            <span>🎬</span>
-            <span>Vlooo</span>
+    <nav className="sticky top-0 z-40 border-b border-[color:var(--line)] bg-white/90 backdrop-blur">
+      <div className="mx-auto flex h-14 items-center justify-between px-6">
+        <div className="flex items-center gap-3">
+          <Link href="/" className="flex items-center gap-2">
+            <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-dashed border-[color:var(--line)] bg-[color:var(--surface)] text-[color:var(--muted)] text-[9px] font-semibold">
+              LOGO
+            </span>
+            <span className="text-lg font-bold text-gray-900">Vlooo</span>
           </Link>
-
-          {/* 메뉴 항목들 */}
-          <div className="flex items-center gap-1">
-            {HEADER_MENU.map((item, index) => renderMenuItem(item, index))}
-          </div>
+          {showSidebarToggle && (
+            <button
+              type="button"
+              onClick={onToggleSidebar}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[color:var(--line)] text-gray-700 hover:text-[color:var(--accent)] hover:border-[color:var(--accent)] transition"
+              aria-label="메뉴 펼치기 또는 접기"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <line x1="3" y1="12" x2="21" y2="12" />
+                <line x1="3" y1="18" x2="21" y2="18" />
+              </svg>
+            </button>
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={onLoginClick}
+            className="inline-flex items-center justify-center rounded-full border border-[color:var(--line)] px-4 py-2 text-sm font-semibold text-gray-800 hover:border-[color:var(--accent)] hover:text-[color:var(--accent)] transition"
+          >
+            로그인
+          </button>
         </div>
       </div>
     </nav>

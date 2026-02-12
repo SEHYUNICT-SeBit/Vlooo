@@ -4,6 +4,7 @@ FFmpeg 기반 비디오 렌더링 서비스
 
 import base64
 import os
+import shutil
 import subprocess
 import tempfile
 from pathlib import Path
@@ -45,7 +46,9 @@ def _create_placeholder_image(path: Path, width: int, height: int, title: str) -
 
     text = title.strip() if title else "Slide"
     font = ImageFont.load_default()
-    text_width, text_height = draw.textsize(text, font=font)
+    bbox = font.getbbox(text)
+    text_width = bbox[2] - bbox[0]
+    text_height = bbox[3] - bbox[1]
     x = max((width - text_width) // 2, 20)
     y = max((height - text_height) // 2, 20)
 
@@ -65,7 +68,21 @@ def _write_concat_file(items: List[Tuple[Path, float]], list_path: Path) -> None
     list_path.write_text("\n".join(lines), encoding="utf-8")
 
 
+def _resolve_ffmpeg() -> str:
+    ffmpeg_path = os.getenv("FFMPEG_PATH")
+    if ffmpeg_path:
+        return ffmpeg_path
+    resolved = shutil.which("ffmpeg")
+    if resolved:
+        return resolved
+    raise FileNotFoundError(
+        "FFmpeg executable not found. Install FFmpeg or set FFMPEG_PATH."
+    )
+
+
 def _run_ffmpeg(args: List[str]) -> None:
+    args = args.copy()
+    args[0] = _resolve_ffmpeg()
     result = subprocess.run(args, capture_output=True, text=True)
     if result.returncode != 0:
         raise RuntimeError(f"FFmpeg 오류: {result.stderr.strip()}")
@@ -129,8 +146,6 @@ def render_video(
         "0",
         "-i",
         str(images_list),
-        "-vsync",
-        "vfr",
         "-r",
         str(fps),
         "-pix_fmt",

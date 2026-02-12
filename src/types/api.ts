@@ -61,7 +61,7 @@ export interface Slide {
 }
 
 export interface ParsePptRequest {
-  fileId: string;
+  file: File;
 }
 
 export interface ParsePptResponse {
@@ -220,4 +220,11 @@ export interface ConversionContextState {
   progress: number;
   error?: string;
   loading: boolean;
+  // 상세 진행도 (슬라이드별 처리 진행 상황)
+  detailedProgress?: {
+    current: number;    // 현재 처리 중인 슬라이드 번호
+    total: number;      // 전체 슬라이드 수
+    stage: string;      // 현재 단계 (scripting, tts, rendering 등)
+    details: string;    // 상세 메시지
+  };
 }

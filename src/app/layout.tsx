@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import '@/globals.css';
-import { AuthProvider } from '@/components/SessionProvider';
+import { ConversionProgressModal } from '@/components/ConversionProgressModal';
+import { AppLayout } from '@/components/AppLayout';
+import { FileUploadModalProvider } from '@/context/FileUploadModalContext';
 
 export const metadata: Metadata = {
   title: 'Vlooo - PPT를 전문가 영상으로',
@@ -15,7 +17,12 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body>
-        <AuthProvider>{children}</AuthProvider>
+        <FileUploadModalProvider>
+          <AppLayout>
+            {children}
+          </AppLayout>
+          <ConversionProgressModal />
+        </FileUploadModalProvider>
       </body>
     </html>
   );

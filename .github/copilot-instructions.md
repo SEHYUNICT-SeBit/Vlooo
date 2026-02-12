@@ -14,7 +14,7 @@
 - **Frontend**: Next.js 14+, React 18+, TypeScript, Tailwind CSS
 - **Backend/Edge**: Cloudflare Workers, FastAPI
 - **Storage**: Cloudflare R2
-- **AI Engines**: OpenAI (GPT-4o-mini), ElevenLabs (TTS), FFmpeg/Remotion
+- **AI Engines**: Ollama (Llama 3.1:8b - local LLM), Google Cloud TTS, FFmpeg/Remotion
 - **Deployment**: Cloudflare Pages (frontend), Workers (serverless backend)
 
 ## Architecture & Key Components
@@ -37,10 +37,11 @@
    - Layout analysis
 
 4. **AI Script Generation** (Backend)
-   - OpenAI GPT-4o-mini for IT expert persona scripting
+   - Ollama (Llama 3.1:8b) for IT expert persona scripting
    - Context-aware narration generation
+   - Local LLM - no external API dependencies
 
-5. **Audio Synthesis** (ElevenLabs API)
+5. **Audio Synthesis** (Google Cloud TTS)
    - Multiple voice options (professional male/female, friendly variants)
    - Real-time preview generation
 
@@ -75,13 +76,52 @@ npm run type-check   # Type checking only
 - Set breakpoints in VSCode (F5 to start debugging)
 - Environment variables in `.env.local`:
   ```
-  NEXT_PUBLIC_API_URL=http://localhost:8000
-  OPENAI_API_KEY=sk-...
-  ELEVENLABS_API_KEY=...
-  CLOUDFLARE_R2_KEY=...
+  NEXT_PUBLIC_FASTAPI_URL=http://localhost:8001
+  FASTAPI_PORT=8001
+  LOCAL_LLM_PROVIDER=ollama
+  OLLAMA_URL=http://localhost:11434
+  OLLAMA_MODEL=llama3.1:8b
+  FFMPEG_PATH=C:\vibe\Vlooo\ffmeg\bin\ffmpeg.exe
   ```
 
 ## Code Patterns & Conventions
+
+### ⚠️ CRITICAL: Windows Encoding Rules (CP949)
+
+**NEVER use emojis or special Unicode characters in Python backend code!**
+
+Windows uses CP949 encoding which **cannot handle emojis**. Using emojis in `print()` statements will cause:
+```
+UnicodeEncodeError: 'cp949' codec can't encode character '\U0001f504'
+```
+
+**Rules:**
+1. ✅ **USE**: ASCII-only characters in all `print()` statements
+2. ❌ **NEVER USE**: Emojis (✅, ❌, ⚠️, 🔄, 📄, 🎬, etc.) in backend logs
+3. ✅ **ALLOWED**: Emojis in GUI widgets (Tkinter), frontend React components
+4. ✅ **LOG FORMAT**: `[HH:MM:SS] [LEVEL] [STEP] message`
+
+**Emoji → ASCII Conversion:**
+- `✅` → `OK -`
+- `❌` → `ERROR -`
+- `⚠️` → `WARN -`
+- `🔄` → `INFO -`
+
+**Example:**
+```python
+# ❌ WRONG - Will crash on Windows!
+print(f"[{timestamp}] [MAJOR] [OLLAMA] ✅ Ollama started successfully")
+
+# ✅ CORRECT - ASCII only
+print(f"[{timestamp}] [MAJOR] [OLLAMA] OK - Ollama started successfully")
+```
+
+**Full documentation**: [WINDOWS_ENCODING_RULES.md](../WINDOWS_ENCODING_RULES.md)
+
+**Before writing ANY backend code:**
+1. Check if it outputs to stdout/stderr
+2. Verify NO emojis are used
+3. Use ASCII characters only
 
 ### Critical Patterns
 
@@ -131,11 +171,85 @@ npm run type-check   # Type checking only
 
 ## Integration Points
 
-- **OpenAI API**: `NEXT_PUBLIC_API_URL/api/script` - generates IT expert narration scripts
-- **ElevenLabs API**: Voice synthesis - multiple Korean voice options
+- **Ollama API**: `http://localhost:11434/api/generate` - generates IT expert narration scripts (local LLM)
+- **Google Cloud TTS**: Voice synthesis - multiple Korean voice options
+- **FFmpeg**: Local video rendering with slides + audio synchronization
 - **Cloudflare R2**: Asset storage (PPT files, generated videos)
 - **Cloudflare Workers**: Serverless execution of CPU-intensive tasks
-- **FastAPI Backend**: PPT parsing, orchestration
+- **FastAPI Backend**: PPT parsing, orchestration, checkpoint management
+
+## ⚠️ Common Mistakes to Avoid
+
+### 1. Windows Encoding Errors (MOST COMMON!)
+❌ **NEVER** use emojis in backend Python code:
+```python
+print(f"[{timestamp}] [MAJOR] [OLLAMA] ✅ Success")  # Will crash!
+```
+✅ **ALWAYS** use ASCII only:
+```python
+print(f"[{timestamp}] [MAJOR] [OLLAMA] OK - Success")  # Safe
+```
+**See**: [WINDOWS_ENCODING_RULES.md](../WINDOWS_ENCODING_RULES.md)
+
+### 2. Wrong Ollama Model Name
+❌ **WRONG**:
+```
+OLLAMA_MODEL=llama3.1  # Missing version suffix - 404 error!
+```
+✅ **CORRECT**:
+```
+OLLAMA_MODEL=llama3.1:8b  # Include :8b suffix
+```
+**Before configuring**: Run `ollama list` to verify exact model name
+
+### 3. Wrong Ollama API Endpoint
+❌ **WRONG**: `/api/chat` (OpenAI-style endpoint)
+✅ **CORRECT**: `/api/generate` (Ollama official endpoint)
+
+**Code Example**:
+```python
+# Correct implementation
+url = f"{ollama_url}/api/generate"  # Not /api/chat
+payload = {
+    "model": "llama3.1:8b",
+    "prompt": "...",  # Not messages array
+    "stream": False
+}
+response = requests.post(url, json=payload)
+content = response.json().get("response")  # Not message.content
+```
+
+### 4. Environment Variables Not Loading
+**Issue**: `.env.local` exists but backend uses wrong values
+
+✅ **Fix in backend/main.py**:
+```python
+from pathlib import Path
+from dotenv import load_dotenv
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+ENV_FILE = PROJECT_ROOT / ".env.local"
+load_dotenv(dotenv_path=str(ENV_FILE))  # Explicit path required!
+```
+
+### 5. FFmpeg Path Issues
+❌ **WRONG**: `FFMPEG_PATH=C:\ffmpeg\bin\ffmpeg.exe` (default assumption)
+✅ **CORRECT**: Verify actual installation path first:
+```powershell
+where ffmpeg
+# or check manual installation
+```
+Then set in `.env.local`:
+```
+FFMPEG_PATH=C:\vibe\Vlooo\ffmeg\bin\ffmpeg.exe  # Actual path
+```
+
+### Verification Checklist Before Coding:
+- [ ] `ollama list` → Verify model name includes `:8b`
+- [ ] Check `.env.local` for all required variables
+- [ ] NO emojis in any `print()` statements
+- [ ] Ollama API uses `/api/generate` endpoint
+- [ ] FFmpeg path exists at configured location
 
 ## Common Tasks
 
@@ -185,5 +299,7 @@ export const HEADER_MENU: MenuItem[] = [
 
 ---
 
-**Last Updated**: February 5, 2026  
+**Last Updated**: February 11, 2026  
 **Status**: 🟢 Production Ready for Menus | 🟡 Backend Integration Pending
+
+⚠️ **CRITICAL REMINDER**: Always follow [Windows Encoding Rules](../WINDOWS_ENCODING_RULES.md) - NO emojis in backend code!

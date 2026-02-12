@@ -1,24 +1,10 @@
-'use client';
-
-import { Navigation } from '@/components/Navigation';
-import { DashboardSidebar } from '@/components/DashboardSidebar';
-import { Footer } from '@/components/Footer';
+import { Fragment } from 'react';
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <>
-      <Navigation isLoggedIn={true} />
-      <div className="flex flex-1">
-        <DashboardSidebar activeId="all-projects" />
-        <main className="flex-1 p-8">
-          {children}
-        </main>
-      </div>
-      <Footer />
-    </>
-  );
+  // AppLayout이 이미 Navigation과 SidebarNavigation을 처리함
+  return <Fragment>{children}</Fragment>;
 }

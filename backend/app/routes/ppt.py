@@ -7,9 +7,15 @@ from fastapi.responses import JSONResponse
 import uuid
 from app.services.ppt_parser import parse_ppt_file
 from app.models import ParsePptResponse, SlideModel, MetadataModel
+from datetime import datetime
 
 
 router = APIRouter(prefix="/api", tags=["ppt"])
+
+
+def _log(level: str, step: str, message: str):
+    timestamp = datetime.utcnow().isoformat()
+    print(f"[{timestamp}] [PPT] [{level}] [{step}] {message}")
 
 
 @router.post("/parse-ppt")
@@ -20,6 +26,8 @@ async def parse_ppt(file: UploadFile = File(...)) -> JSONResponse:
     파일을 업로드하면 슬라이드, 텍스트, 이미지를 추출합니다.
     """
     try:
+        _log("MINOR", "START", f"filename={file.filename or 'unknown'}")
+
         # 파일 타입 검증
         if not file.filename:
             raise HTTPException(status_code=400, detail="파일명이 없습니다")
@@ -41,6 +49,19 @@ async def parse_ppt(file: UploadFile = File(...)) -> JSONResponse:
                 detail=f"파일이 너무 큽니다 (최대 {max_size / 1024 / 1024}MB)"
             )
         
+        # 프로젝트 ID 생성 (파싱 전에 생성하여 진행도 추적 가능)
+        project_id = f"proj_{uuid.uuid4().hex[:12]}"
+        
+        # 진행 상태 업데이트
+        from main import update_project_progress
+        update_project_progress(
+            project_id,
+            "parsing",
+            current=0,
+            total=1,
+            details="PPT 파일 분석 중..."
+        )
+        
         # PPT 파싱
         parse_result = parse_ppt_file(file_content)
         
@@ -49,9 +70,6 @@ async def parse_ppt(file: UploadFile = File(...)) -> JSONResponse:
                 status_code=400,
                 detail=f"PPT 파싱 실패: {parse_result.get('error', 'Unknown error')}"
             )
-        
-        # 프로젝트 ID 생성
-        project_id = f"proj_{uuid.uuid4().hex[:12]}"
         
         # 슬라이드 모델 생성
         slides = [
@@ -65,6 +83,15 @@ async def parse_ppt(file: UploadFile = File(...)) -> JSONResponse:
             )
             for s in parse_result.get("slides", [])
         ]
+        
+        # 파싱 완료 상태 업데이트
+        update_project_progress(
+            project_id,
+            "parsing",
+            current=len(slides),
+            total=len(slides),
+            details=f"PPT 분석 완료 ({len(slides)}개 슬라이드)"
+        )
         
         # 메타데이터 모델 생성
         metadata = MetadataModel(
@@ -80,6 +107,17 @@ async def parse_ppt(file: UploadFile = File(...)) -> JSONResponse:
             metadata=metadata,
         )
         
+        # 파싱 결과 저장 (재개 시 사용)
+        from main import save_stage_result
+        save_stage_result(
+            project_id,
+            "parsing",
+            "completed",
+            data=response.model_dump()
+        )
+        
+        _log("MAJOR", "DONE", f"projectId={project_id} slides={len(slides)}")
+
         return JSONResponse(
             status_code=200,
             content={
@@ -90,6 +128,7 @@ async def parse_ppt(file: UploadFile = File(...)) -> JSONResponse:
         )
     
     except HTTPException as e:
+        _log("CRITICAL", "ERROR", str(e.detail))
         return JSONResponse(
             status_code=e.status_code,
             content={
@@ -103,6 +142,7 @@ async def parse_ppt(file: UploadFile = File(...)) -> JSONResponse:
         )
     
     except Exception as e:
+        _log("CRITICAL", "ERROR", str(e))
         return JSONResponse(
             status_code=500,
             content={

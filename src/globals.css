@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -8,10 +10,30 @@
   box-sizing: border-box;
 }
 
+:root {
+  --ink: #111827;
+  --muted: #5a6472;
+  --surface: #f7f6f2;
+  --surface-strong: #ffffff;
+  --line: #e6e3dd;
+  --accent: #2b7a78;
+  --accent-strong: #1f5f5d;
+  --highlight: #f4b860;
+}
+
 body {
-  background-color: #f9fafb;
-  color: #111827;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  background-color: var(--surface);
+  color: var(--ink);
+  font-family: 'IBM Plex Sans', 'Segoe UI', sans-serif;
+  letter-spacing: -0.01em;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
+  letter-spacing: -0.02em;
 }

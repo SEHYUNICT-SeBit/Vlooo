@@ -13,12 +13,12 @@ interface ProgressDisplayProps {
 }
 
 const STEP_DETAILS: Record<string, { icon: string; description: string }> = {
-  upload: { icon: '📤', description: 'PPT 파일을 업로드합니다' },
-  parsing: { icon: '📊', description: '슬라이드와 콘텐츠를 분석합니다' },
-  scripting: { icon: '✍️', description: 'AI가 나레이션 스크립트를 작성합니다' },
-  'voice-synthesis': { icon: '🎙️', description: '스크립트를 음성으로 변환합니다' },
-  rendering: { icon: '🎬', description: '최종 영상을 렌더링합니다' },
-  completed: { icon: '✨', description: '영상 변환이 완료되었습니다!' },
+  upload: { icon: '', description: 'PPT 파일을 업로드합니다' },
+  parsing: { icon: '', description: '슬라이드와 콘텐츠를 분석합니다' },
+  scripting: { icon: '', description: 'AI가 나레이션 스크립트를 작성합니다' },
+  'voice-synthesis': { icon: '', description: '스크립트를 음성으로 변환합니다' },
+  rendering: { icon: '', description: '최종 영상을 렌더링합니다' },
+  completed: { icon: '', description: '영상 변환이 완료되었습니다!' },
 };
 
 export const ProgressDisplay: React.FC<ProgressDisplayProps> = ({ showDetails = true }) => {
@@ -32,7 +32,7 @@ export const ProgressDisplay: React.FC<ProgressDisplayProps> = ({ showDetails = 
       <div className="mb-8">
         <div className="flex justify-between items-center mb-3">
           <div className="flex items-center gap-3">
-            <div className="text-2xl">{detail?.icon}</div>
+            {detail?.icon && <div className="text-2xl">{detail.icon}</div>}
             <div>
               <h3 className="font-bold text-gray-900">{stepName}</h3>
               {showDetails && <p className="text-sm text-gray-600">{detail?.description}</p>}
@@ -48,7 +48,7 @@ export const ProgressDisplay: React.FC<ProgressDisplayProps> = ({ showDetails = 
             )}
           </div>
           <div className="text-right">
-            <div className="text-3xl font-bold text-blue-600">{progress}%</div>
+            <div className="text-3xl font-bold text-[color:var(--accent)]">{progress}%</div>
             <p className="text-xs text-gray-500">진행 중</p>
           </div>
         </div>
@@ -56,7 +56,7 @@ export const ProgressDisplay: React.FC<ProgressDisplayProps> = ({ showDetails = 
         {/* 진행률 바 */}
         <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
           <div
-            className="bg-gradient-to-r from-blue-500 to-blue-600 h-full transition-all duration-500 rounded-full"
+            className="bg-[color:var(--accent)] h-full transition-all duration-500 rounded-full"
             style={{ width: `${progress}%` }}
           ></div>
         </div>

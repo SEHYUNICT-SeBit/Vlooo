@@ -18,19 +18,19 @@ interface ErrorDisplayProps {
 const errorColors = {
   error: {
     container: 'bg-red-50 border-red-200',
-    icon: '❌',
+    icon: '!',
     textColor: 'text-red-800',
     buttonColor: 'bg-red-600 hover:bg-red-700',
   },
   warning: {
     container: 'bg-yellow-50 border-yellow-200',
-    icon: '⚠️',
+    icon: '!',
     textColor: 'text-yellow-800',
     buttonColor: 'bg-yellow-600 hover:bg-yellow-700',
   },
   info: {
     container: 'bg-blue-50 border-blue-200',
-    icon: 'ℹ️',
+    icon: 'i',
     textColor: 'text-blue-800',
     buttonColor: 'bg-blue-600 hover:bg-blue-700',
   },
@@ -100,7 +100,7 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
                 font-semibold transition-colors
               `}
             >
-              🔄 재시도
+              재시도
             </button>
           )}
 

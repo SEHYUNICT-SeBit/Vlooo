@@ -4,10 +4,16 @@
  */
 
 export { Navigation } from './Navigation';
+export { SidebarNavigation } from './SidebarNavigation';
+export { AppLayout } from './AppLayout';
 export { DashboardSidebar } from './DashboardSidebar';
 export { ConversionSteps } from './ConversionSteps';
 export { Footer } from './Footer';
 export { FileUploader } from './FileUploader';
+export { FileUploadModal } from './FileUploadModal';
+export { LoginModal } from './LoginModal';
 export { ProgressDisplay } from './ProgressDisplay';
 export { ErrorDisplay } from './ErrorDisplay';
 export { ResultsDisplay } from './ResultsDisplay';
+export { ConversionProgressModal } from './ConversionProgressModal';
+

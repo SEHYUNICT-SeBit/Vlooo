@@ -7,25 +7,16 @@
 
 import React, { useRef, useState } from 'react';
 import { useConversionStore } from '@/context/ConversionStore';
-import { apiClient } from '@/services/api';
-import { UploadProgress } from '@/types/api';
 
 interface FileUploaderProps {
-  onUploadComplete?: (fileId: string) => void;
+  onUploadComplete?: (file: File) => void;
   onError?: (error: string) => void;
 }
 
 export const FileUploader: React.FC<FileUploaderProps> = ({ onUploadComplete, onError }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState<UploadProgress>({
-    loaded: 0,
-    total: 0,
-    percentage: 0,
-  });
-
-  const { setUploadedFile, setProgress, setError } = useConversionStore();
+  const { setUploadedFile, setError } = useConversionStore();
 
   const handleFile = async (file: File) => {
     // 파일 타입 검증
@@ -51,23 +42,13 @@ export const FileUploader: React.FC<FileUploaderProps> = ({ onUploadComplete, on
     }
 
     try {
-      setUploading(true);
       setError(undefined);
       setUploadedFile({ name: file.name, size: file.size });
-
-      // API를 통해 파일 업로드
-      const response = await apiClient.uploadFile(file, undefined, (progress) => {
-        setUploadProgress(progress);
-        setProgress(progress.percentage);
-      });
-
-      setUploading(false);
-      onUploadComplete?.(response.fileId);
+      onUploadComplete?.(file);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : '파일 업로드 실패';
       setError(errorMessage);
       onError?.(errorMessage);
-      setUploading(false);
     }
   };
 
@@ -102,89 +83,47 @@ export const FileUploader: React.FC<FileUploaderProps> = ({ onUploadComplete, on
   };
 
   return (
-    <div className="w-full max-w-xl mx-auto">
+    <div className="w-full">
       <div
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         className={`
-          relative p-12 rounded-xl border-2 border-dashed transition-all
+          relative rounded-2xl border border-dashed p-10 transition-all
           ${
             isDragging
-              ? 'border-blue-500 bg-blue-50'
-              : uploading
-                ? 'border-gray-300 bg-gray-50'
-                : 'border-gray-300 bg-white hover:border-blue-400 hover:bg-blue-50 cursor-pointer'
+              ? 'border-[color:var(--accent)] bg-[color:var(--surface)]'
+              : 'border-[color:var(--line)] bg-white hover:border-[color:var(--accent)] cursor-pointer'
           }
         `}
       >
-        {!uploading ? (
-          <>
-            {/* 아이콘 */}
-            <div className="text-center mb-4">
-              <div className="text-5xl mb-4">📄</div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">PPT 파일을 업로드하세요</h3>
-              <p className="text-gray-600 mb-4">
-                드래그앤드롭 또는 클릭하여 파일을 선택하세요
-              </p>
-              <p className="text-sm text-gray-500">지원 형식: .pptx, .ppt (최대 100MB)</p>
-            </div>
+        <div className="text-center space-y-3">
+          <div className="text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--accent)]">
+            Upload
+          </div>
+          <h3 className="text-2xl font-semibold text-gray-900">PPT 파일을 업로드하세요</h3>
+          <p className="text-sm text-[color:var(--muted)]">
+            드래그 앤 드롭 또는 버튼을 눌러 파일을 선택합니다.
+          </p>
+          <p className="text-xs text-[color:var(--muted)]">지원 형식: .ppt, .pptx (최대 100MB)</p>
+        </div>
 
-            {/* 파일 선택 버튼 */}
-            <div className="text-center">
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                className="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors inline-block"
-              >
-                파일 선택
-              </button>
-            </div>
+        <div className="mt-6 flex justify-center">
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="inline-flex items-center justify-center rounded-full bg-[color:var(--accent)] px-6 py-3 text-sm font-semibold text-white hover:bg-[color:var(--accent-strong)] transition"
+          >
+            파일 선택
+          </button>
+        </div>
 
-            {/* 숨겨진 파일 입력 */}
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".pptx,.ppt,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation"
-              onChange={handleFileSelect}
-              disabled={uploading}
-              className="hidden"
-            />
-          </>
-        ) : (
-          <>
-            {/* 업로드 진행 중 */}
-            <div className="text-center">
-              <div className="mb-6">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 mb-4">
-                  <div className="w-10 h-10 border-4 border-gray-300 border-t-blue-600 rounded-full animate-spin"></div>
-                </div>
-              </div>
-
-              <h3 className="text-lg font-bold text-gray-900 mb-2">파일 업로드 중...</h3>
-
-              {/* 진행률 바 */}
-              <div className="mb-4">
-                <div className="bg-gray-200 rounded-full h-3 overflow-hidden">
-                  <div
-                    className="bg-blue-600 h-full transition-all duration-300"
-                    style={{ width: `${uploadProgress.percentage}%` }}
-                  ></div>
-                </div>
-              </div>
-
-              {/* 진행률 텍스트 */}
-              <p className="text-gray-600 text-sm">
-                {uploadProgress.percentage}% 완료
-                {uploadProgress.total > 0 && (
-                  <span className="block mt-1">
-                    {(uploadProgress.loaded / 1024 / 1024).toFixed(2)} /{' '}
-                    {(uploadProgress.total / 1024 / 1024).toFixed(2)} MB
-                  </span>
-                )}
-              </p>
-            </div>
-          </>
-        )}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".pptx,.ppt,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation"
+          onChange={handleFileSelect}
+          className="hidden"
+        />
       </div>
     </div>
   );

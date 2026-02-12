@@ -53,10 +53,9 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   return (
     <div className="w-full max-w-4xl mx-auto space-y-6">
       {/* 완료 헤더 */}
-      <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl p-8 text-center">
-        <div className="text-6xl mb-4">✨</div>
-        <h2 className="text-3xl font-bold text-green-900 mb-2">변환이 완료되었습니다!</h2>
-        <p className="text-green-700">&quot;{projectName}&quot; 프로젝트가 성공적으로 처리되었습니다.</p>
+      <div className="border border-[color:var(--line)] rounded-2xl p-8 text-center bg-white">
+        <h2 className="text-3xl font-semibold text-gray-900 mb-2">변환이 완료되었습니다</h2>
+        <p className="text-sm text-[color:var(--muted)]">"{projectName}" 프로젝트가 성공적으로 처리되었습니다.</p>
       </div>
 
       {/* 최종 영상 */}
@@ -85,9 +84,9 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
               </div>
               <button
                 onClick={() => downloadFile(videoUrl, `${projectName}_final.mp4`)}
-                className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+                className="bg-[color:var(--accent)] text-white px-6 py-2 rounded-lg hover:bg-[color:var(--accent-strong)] transition-colors font-semibold"
               >
-                💾 다운로드
+                다운로드
               </button>
             </div>
             <div className="bg-gray-100 p-3 rounded-lg break-all text-sm text-gray-600">
@@ -101,7 +100,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
       {audioUrls && audioUrls.length > 0 && (
         <div className="bg-white rounded-xl shadow-md overflow-hidden">
           <div className="p-6 border-b border-gray-200">
-            <h3 className="font-bold text-gray-900 text-lg mb-2">📁 음성 파일</h3>
+            <h3 className="font-bold text-gray-900 text-lg mb-2">음성 파일</h3>
             <p className="text-sm text-gray-600">각 슬라이드별 생성된 음성 파일</p>
           </div>
 
@@ -122,15 +121,15 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                       onClick={() => copyToClipboard(audio.audioUrl, index)}
                       className="px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-100 transition-colors text-sm"
                     >
-                      {copiedIndex === index ? '✓ 복사됨' : '📋 URL 복사'}
+                      {copiedIndex === index ? '복사됨' : 'URL 복사'}
                     </button>
                     <button
                       onClick={() =>
                         downloadFile(audio.audioUrl, `${projectName}_slide${audio.slideNumber}.mp3`)
                       }
-                      className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm"
+                      className="px-4 py-2 rounded-lg bg-[color:var(--accent)] text-white hover:bg-[color:var(--accent-strong)] transition-colors text-sm"
                     >
-                      💾 다운로드
+                      다운로드
                     </button>
                   </div>
                 </div>
@@ -150,7 +149,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
       {scripts && scripts.length > 0 && (
         <div className="bg-white rounded-xl shadow-md overflow-hidden">
           <div className="p-6 border-b border-gray-200">
-            <h3 className="font-bold text-gray-900 text-lg mb-2">📝 스크립트</h3>
+            <h3 className="font-bold text-gray-900 text-lg mb-2">스크립트</h3>
             <p className="text-sm text-gray-600">AI가 생성한 나레이션 스크립트</p>
           </div>
 
@@ -188,7 +187,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                     onClick={() => copyToClipboard(script.scriptText, index)}
                     className="w-full px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-100 transition-colors text-sm font-semibold"
                   >
-                    {copiedIndex === index ? '✓ 복사됨' : '📋 스크립트 복사'}
+                    {copiedIndex === index ? '복사됨' : '스크립트 복사'}
                   </button>
                 </div>
               </details>
@@ -198,29 +197,29 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
       )}
 
       {/* 공유 & 다음 단계 */}
-      <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
-        <h3 className="font-bold text-gray-900 mb-4">🎉 다음 단계</h3>
+      <div className="bg-[color:var(--surface)] border border-[color:var(--line)] rounded-xl p-6">
+        <h3 className="font-bold text-gray-900 mb-4">다음 단계</h3>
         <ul className="space-y-2 text-gray-700">
           <li className="flex items-start gap-2">
-            <span>✓</span>
-            <span>생성된 영상을 검토하고 수정이 필요하시면 다시 변환해보세요</span>
+            <span>-</span>
+            <span>생성된 영상을 검토하고 필요하면 다시 변환하세요</span>
           </li>
           <li className="flex items-start gap-2">
-            <span>✓</span>
-            <span>SNS, YouTube, 프레젠테이션 등 다양한 플랫폼에서 사용할 수 있습니다</span>
+            <span>-</span>
+            <span>SNS, 강의, 세일즈 자료로 바로 사용할 수 있습니다</span>
           </li>
           <li className="flex items-start gap-2">
-            <span>✓</span>
-            <span>추가 편집이 필요한 경우 비디오 편집 소프트웨어를 사용하세요</span>
+            <span>-</span>
+            <span>추가 편집이 필요하면 영상 편집 도구를 사용하세요</span>
           </li>
         </ul>
 
         <div className="mt-6 flex gap-3">
-          <button className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold">
-            🏠 홈으로 돌아가기
+          <button className="flex-1 bg-[color:var(--accent)] text-white px-6 py-3 rounded-lg hover:bg-[color:var(--accent-strong)] transition-colors font-semibold">
+            홈으로 돌아가기
           </button>
-          <button className="flex-1 border-2 border-blue-600 text-blue-600 px-6 py-3 rounded-lg hover:bg-blue-50 transition-colors font-semibold">
-            🆕 새 프로젝트 만들기
+          <button className="flex-1 border-2 border-[color:var(--accent)] text-[color:var(--accent)] px-6 py-3 rounded-lg hover:bg-[color:var(--surface)] transition-colors font-semibold">
+            새 프로젝트 만들기
           </button>
         </div>
       </div>

@@ -57,6 +57,62 @@ export const HEADER_MENU: MenuItem[] = [
   },
 ];
 
+/**
+ * ⚠️ IMPORTANT: 아이콘 레일 메뉴 (모든 페이지에서 동일 - 절대 변경 금지!)
+ * 
+ * 사용처: src/components/SidebarNavigation.tsx (아이콘 레일)
+ * 
+ * 항상 표시: 홈, 대시보드
+ */
+export const PRIMARY_SIDEBAR_MENU: MenuItem[] = [
+  {
+    id: 'home',
+    label: '홈',
+    path: '/',
+    icon: 'home',
+  },
+  {
+    id: 'dashboard',
+    label: '대시보드',
+    path: '/dashboard',
+    icon: 'grid',
+  },
+];
+
+/**
+ * 홈 페이지 메뉴 패널 (/ 페이지에서만 사용)
+ * 
+ * 사용처: src/components/AppLayout.tsx → SidebarNavigation
+ */
+export const HOME_MENU_PANEL: MenuItem[] = [
+  {
+    id: 'home',
+    label: '홈',
+    path: '/',
+    icon: 'home',
+  },
+  {
+    id: 'new-video',
+    label: '새 동영상 만들기',
+    path: '',  // 클릭 시 모달 열기
+    icon: 'plus-square',
+  },
+];
+
+/**
+ * 대시보드 페이지 메뉴 패널 (/dashboard 페이지에서만 사용)
+ * 
+ * 사용처: src/components/AppLayout.tsx → SidebarNavigation
+ */
+export const DASHBOARD_MENU_PANEL: MenuItem[] = [
+  {
+    id: 'dashboard',
+    label: '대시보드',
+    path: '/dashboard',
+    icon: 'grid',
+  },
+];
+
 // 대시보드 사이드바 메뉴
 export const DASHBOARD_MENU: MenuSection[] = [
   {

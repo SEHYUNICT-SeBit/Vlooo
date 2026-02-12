@@ -3,6 +3,7 @@
 """
 
 import os
+import asyncio
 from datetime import datetime
 from pathlib import Path
 from typing import List, Optional
@@ -16,6 +17,11 @@ from app.services.r2_storage import get_r2_service
 
 
 router = APIRouter(prefix="/api", tags=["render"])
+
+
+def _log(level: str, step: str, message: str):
+    timestamp = datetime.utcnow().isoformat()
+    print(f"[{timestamp}] [RENDER] [{level}] [{step}] {message}")
 
 
 class SlideItem(BaseModel):
@@ -54,8 +60,41 @@ async def render_video_endpoint(request: RenderVideoRequest) -> JSONResponse:
             raise HTTPException(status_code=400, detail="slides와 audioUrls가 필요합니다")
         if len(request.slides) != len(request.audioUrls):
             raise HTTPException(status_code=400, detail="slides와 audioUrls 개수가 일치하지 않습니다")
+        
+        # 이미 완료된 단계인지 체크 (재개 로직)
+        from main import get_stage_result
+        cached_result = get_stage_result(request.projectId, "rendering")
+        if cached_result and cached_result.get("status") == "completed":
+            _log("MINOR", "CACHE_HIT", f"projectId={request.projectId} - using cached video")
+            cached_data = cached_result.get("data", {})
+            return JSONResponse(
+                status_code=200,
+                content={
+                    "success": True,
+                    "data": cached_data,
+                    "cached": True,
+                    "timestamp": datetime.utcnow().isoformat(),
+                }
+            )
 
-        result = render_video(
+        _log(
+            "MINOR",
+            "START",
+            f"projectId={request.projectId} slides={len(request.slides)} fps={request.fps} res={request.resolution}",
+        )
+
+        # 진행 상태 업데이트
+        from main import update_project_progress
+        update_project_progress(
+            request.projectId,
+            "rendering",
+            current=0,
+            total=len(request.slides),
+            details="비디오 렌더링 시작..."
+        )
+
+        result = await asyncio.to_thread(
+            render_video,
             project_id=request.projectId,
             slides=[s.model_dump() for s in request.slides],
             audio_urls=[a.model_dump() for a in request.audioUrls],
@@ -94,6 +133,15 @@ async def render_video_endpoint(request: RenderVideoRequest) -> JSONResponse:
             public_base = os.getenv("FASTAPI_PUBLIC_URL", "http://localhost:8000")
             video_url = f"{public_base}/media/{target_path.name}"
 
+        # 렌더링 완료 상태 업데이트
+        update_project_progress(
+            request.projectId,
+            "rendering",
+            current=len(request.slides),
+            total=len(request.slides),
+            details="렌더링 완료!"
+        )
+
         response = {
             "projectId": request.projectId,
             "videoUrl": video_url,
@@ -103,6 +151,17 @@ async def render_video_endpoint(request: RenderVideoRequest) -> JSONResponse:
             "renderStatus": "completed",
             "completedAt": datetime.utcnow().isoformat(),
         }
+        
+        # 렌더링 결과 저장 (재개 시 사용)
+        from main import save_stage_result
+        save_stage_result(
+            request.projectId,
+            "rendering",
+            "completed",
+            data=response
+        )
+
+        _log("MAJOR", "DONE", f"duration={response['duration']}s url={(video_url or 'local')}" )
 
         return JSONResponse(
             status_code=200,
@@ -114,6 +173,7 @@ async def render_video_endpoint(request: RenderVideoRequest) -> JSONResponse:
         )
 
     except HTTPException as e:
+        _log("CRITICAL", "ERROR", str(e.detail))
         return JSONResponse(
             status_code=e.status_code,
             content={
@@ -127,6 +187,7 @@ async def render_video_endpoint(request: RenderVideoRequest) -> JSONResponse:
         )
 
     except Exception as e:
+        _log("CRITICAL", "ERROR", str(e))
         return JSONResponse(
             status_code=500,
             content={

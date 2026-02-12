@@ -5,46 +5,51 @@
  */
 
 import { NextRequest } from 'next/server';
-import { z } from 'zod';
-import { successResponse, errorResponse, logError, createApiError, ERROR_CODES, validationError } from '@/utils/errors';
-import { ParsePptResponse } from '@/types/api';
-
-const ParsePptRequestSchema = z.object({
-  fileId: z.string().min(1, '파일 ID가 필요합니다'),
-});
+import {
+  successResponse,
+  errorResponse,
+  logError,
+  createApiError,
+  ERROR_CODES,
+  validateFile,
+} from '@/utils/errors';
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+    const formData = await request.formData();
+    const file = formData.get('file');
 
-    // 입력 검증
-    const validation = ParsePptRequestSchema.safeParse(body);
-    if (!validation.success) {
-      throw validationError(validation.error.flatten().fieldErrors as any);
+    if (!file || !(file instanceof File)) {
+      throw createApiError(
+        ERROR_CODES.MISSING_REQUIRED_FIELD,
+        '파일이 필요합니다.',
+        400,
+        { field: 'file' }
+      );
     }
 
-    const { fileId } = validation.data;
+    validateFile(file);
 
-    console.log(`[PARSE_PPT] 파싱 시작: ${fileId}`);
+    console.log(`[PARSE_PPT] 파싱 시작: ${file.name}`);
 
-    // TODO: 실제 구현
-    // 1. fileId로 파일 조회 (R2 또는 DB)
-    // 2. python-pptx를 사용하여 PPT 파싱 (FastAPI 백엔드로 전달)
-    // 3. 슬라이드 정보 추출
-    // 4. 이미지 R2에 업로드
+    const backendUrl = process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:8001';
+    const response = await fetch(`${backendUrl}/api/parse-ppt`, {
+      method: 'POST',
+      body: formData,
+    });
 
-    const mockResponse: ParsePptResponse = {
-      projectId: `proj_${Date.now()}`,
-      totalSlides: 0,
-      slides: [],
-      extractedText: '',
-      metadata: {
-        pptTitle: 'Sample PPT',
-        createdAt: new Date().toISOString(),
-      },
-    };
+    const payload = await response.json();
 
-    return successResponse(mockResponse, 200);
+    if (!payload.success) {
+      throw createApiError(
+        ERROR_CODES.PPT_PARSE_ERROR,
+        payload.error?.message || 'PPT 파싱 실패',
+        response.status,
+        payload.error?.details
+      );
+    }
+
+    return successResponse(payload.data, 200);
   } catch (error) {
     logError(error, { endpoint: '/api/parse-ppt' });
     return errorResponse(error);

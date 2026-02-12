@@ -2,6 +2,8 @@
 
 FastAPI 기반 PPT 파싱 및 처리 백엔드
 
+> ⚠️ **Windows 개발자 필독:** 프로젝트 루트의 [WINDOWS_ENCODING_RULES.md](../WINDOWS_ENCODING_RULES.md)를 반드시 읽어주세요!
+
 ## 🚀 빠른 시작
 
 ### 1. 환경 설정

@@ -19,10 +19,21 @@ import {
 class ApiClient {
   private axiosInstance: AxiosInstance;
 
-  constructor(baseURL: string = process.env.NEXT_PUBLIC_API_URL || '') {
+  constructor(baseURL?: string) {
+    const rawBase =
+      baseURL ||
+      process.env.NEXT_PUBLIC_API_URL ||
+      process.env.NEXT_PUBLIC_FASTAPI_URL ||
+      '';
+    const normalizedBase = rawBase
+      ? (rawBase.startsWith('http://') || rawBase.startsWith('https://')
+          ? rawBase
+          : `http://${rawBase}`)
+      : '';
+
     this.axiosInstance = axios.create({
-      baseURL,
-      timeout: 30000,
+      baseURL: normalizedBase,
+      timeout: 0, // 타임아웃 없음 - 서버 응답을 무한정 대기
       headers: {
         'Content-Type': 'application/json',
       },
@@ -79,9 +90,23 @@ class ApiClient {
   /**
    * PPT 파일 파싱
    */
-  async parsePpt(fileId: string): Promise<ParsePptResponse> {
-    const response = await this.axiosInstance.post<ApiResponse<ParsePptResponse>>('/api/parse-ppt', {
-      fileId,
+  async parsePpt(file: File, onProgress?: (progress: UploadProgress) => void): Promise<ParsePptResponse> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await this.axiosInstance.post<ApiResponse<ParsePptResponse>>('/api/parse-ppt', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+      onUploadProgress: (progressEvent) => {
+        if (onProgress && progressEvent.total) {
+          onProgress({
+            loaded: progressEvent.loaded,
+            total: progressEvent.total,
+            percentage: Math.round((progressEvent.loaded / progressEvent.total) * 100),
+          });
+        }
+      },
     });
     return response.data.data!;
   }
