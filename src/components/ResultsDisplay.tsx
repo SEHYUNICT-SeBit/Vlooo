@@ -55,7 +55,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
       {/* 완료 헤더 */}
       <div className="border border-[color:var(--line)] rounded-2xl p-8 text-center bg-white">
         <h2 className="text-3xl font-semibold text-gray-900 mb-2">변환이 완료되었습니다</h2>
-        <p className="text-sm text-[color:var(--muted)]">"{projectName}" 프로젝트가 성공적으로 처리되었습니다.</p>
+        <p className="text-sm text-[color:var(--muted)]">&quot;{projectName}&quot; 프로젝트가 성공적으로 처리되었습니다.</p>
       </div>
 
       {/* 최종 영상 */}

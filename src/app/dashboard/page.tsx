@@ -27,10 +27,9 @@ export default function DashboardPage() {
     const loadStatus = async () => {
       try {
         const status = await apiClient.getProjectStatus(projectId);
-        const rendering = status?.results?.rendering;
-        const renderedUrl = rendering?.data?.videoUrl;
+        const renderedUrl = status?.results?.videoUrl;
 
-        if (rendering?.status === 'completed' && renderedUrl && isMounted) {
+        if (renderedUrl && isMounted) {
           setVideoUrl(renderedUrl);
           setCurrentStep('completed');
         }
