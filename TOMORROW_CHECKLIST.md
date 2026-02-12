@@ -64,32 +64,42 @@
 
 **가이드**: [PRODUCTION_DEPLOYMENT_GUIDE.md](PRODUCTION_DEPLOYMENT_GUIDE.md)
 
-### Step 1️⃣: NEXTAUTH_SECRET 생성
-- [ ] 강력한 난수 생성 (32자 이상)
-- [ ] 안전한 곳에 기록
+### 🚀 Step 1️⃣: NEXTAUTH_SECRET 생성 ✅ 완료
+```
+✅ reFUR6dkwq6J4NumII0Km9kjucrpdNmzAfwY+gYkyRY=
+```
 
-### Step 2️⃣: .env.production 최종 작성
-- [ ] NEXT_PUBLIC_FASTAPI_URL 확인
-- [ ] NEXTAUTH_URL 확인
-- [ ] NEXTAUTH_SECRET 입력
-- [ ] FastAPI 백엔드 배포 URL 결정
+### 🚀 Step 2️⃣: .env.production 최종 작성 ✅ 완료
+- [x] NEXTAUTH_SECRET 입력
+- [x] NEXTAUTH_URL 설정
+- [x] FastAPI URL 설정 (임시: localhost:8001)
+- [x] FFmpeg 경로 (Linux: /usr/bin/ffmpeg)
 
-### Step 3️⃣: Cloudflare Pages 프로젝트 생성
-- [ ] Cloudflare 계정 로그인
-- [ ] Pages → Create a project
-- [ ] GitHub 리포지토리 연동
-- [ ] 빌드 설정: `npm run pages:build`
-- [ ] 환경 변수 모두 설정
+### 🚀 Step 3️⃣: Cloudflare Pages 배포 🔄 진행 중
+**가이드**: [CLOUDFLARE_DEPLOYMENT_EXECUTION.md](CLOUDFLARE_DEPLOYMENT_EXECUTION.md)
 
-### Step 4️⃣: 배포 실행
-- [ ] 自動 배포 (GitHub push) 또는
-- [ ] 수동 배포 (Wrangler CLI)
+**즉시 해야 할 것:**
+1. [ ] https://dash.cloudflare.com 로그인
+2. [ ] **Pages** → **Create a project** 클릭
+3. [ ] GitHub 연동: SEHYUNICT-SeBit/Vlooo 선택
+4. [ ] 빌드 설정:
+   - Build command: `npm run pages:build`
+   - Build output: `.vercel/output/static`
+5. [ ] 환경 변수 설정 (Production):
+   - `NEXT_PUBLIC_APP_ENV=production`
+   - `NEXT_PUBLIC_API_URL=http://localhost:8001`
+   - `NEXT_PUBLIC_FASTAPI_URL=http://localhost:8001`
+   - `NEXTAUTH_URL=http://localhost:3000`
+   - `NEXTAUTH_SECRET=reFUR6dkwq6J4NumII0Km9kjucrpdNmzAfwY+gYkyRY=`
+6. [ ] 배포 실행 (자동 또는 수동)
+7. [ ] 배포 완료 확인 (Status: ACTIVE)
 
-### Step 5️⃣: 배포 후 검증
-- [ ] Deployments "Active" 상태 확인
-- [ ] 배포 URL 접속 테스트
+### ✅ Step 4️⃣: 배포 후 검증 ⏳ 대기
+- [ ] 배포 URL 접속 (https://vlooo.pages.dev)
 - [ ] 모든 페이지 로드 확인
-- [ ] API 연동 확인
+- [ ] 네비게이션 정상 작동
+- [ ] DevTools Console 에러 0개
+- [ ] Network API 호출 상태 확인
 
 ---
 
